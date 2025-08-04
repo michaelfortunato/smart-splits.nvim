@@ -356,11 +356,11 @@ local function move_cursor(direction, opts)
     end
   end
 
-  if handle_floating_window(function()
-    mux.move_pane(direction, true, at_edge)
-  end) then
-    return
-  end
+  -- if handle_floating_window(function()
+  --   mux.move_pane(direction, true, at_edge)
+  -- end) then
+  --   return
+  -- end
 
   local offset = vim.fn.winline() + vim.api.nvim_win_get_position(0)[1]
   local dir_key = DirectionKeys[direction]
@@ -374,7 +374,15 @@ local function move_cursor(direction, opts)
 
   if will_wrap then
     -- if we can move with mux, then we're good
-    if mux.move_pane(direction, will_wrap, at_edge) then
+    local dir_keys_kitty = {
+      [Direction.left] = 'left',
+      [Direction.right] = 'right',
+      [Direction.up] = 'top',
+      [Direction.down] = 'bottom',
+    }
+    dir_kit = dir_keys_kitty[direction]
+    local ok, _ = pcall(vim.fn.system, { 'kitten', '@', 'focus-window', '--match', 'neighbor:' .. dir_kit })
+    if ok then
       return
     end
 

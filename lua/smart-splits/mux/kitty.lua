@@ -55,22 +55,23 @@ local M = {}
 M.type = 'kitty'
 
 function M.current_pane_id()
-  local active_tab = get_active_tab()
-
-  if not active_tab then
-    return nil
-  end
-
-  local active_pane = utils.tbl_find(active_tab.windows, function(window)
-    -- different versions of Kitty have different output for this
-    return (window.is_active or window.is_active_window) and window.is_focused
-  end)
-
-  if not active_pane then
-    return nil
-  end
-
-  return active_pane.id
+  return vim.env.KITTY_WINDOW_ID
+  -- local active_tab = get_active_tab()
+  --
+  -- if not active_tab then
+  --   return nil
+  -- end
+  --
+  -- local active_pane = utils.tbl_find(active_tab.windows, function(window)
+  --   -- different versions of Kitty have different output for this
+  --   return (window.is_active or window.is_active_window) and window.is_focused
+  -- end)
+  --
+  -- if not active_pane then
+  --   return nil
+  -- end
+  --
+  -- return active_pane.id
 end
 
 function M.current_pane_at_edge()
@@ -79,7 +80,8 @@ end
 
 function M.is_in_session()
   -- Kitty requires that remote control is enabled to send commands to it
-  return vim.env.KITTY_LISTEN_ON ~= nil and #vim.env.KITTY_LISTEN_ON > 0
+  return true
+  -- return vim.env.KITTY_LISTEN_ON ~= nil and #vim.env.KITTY_LISTEN_ON > 0
 end
 
 function M.current_pane_is_zoomed()
@@ -98,7 +100,8 @@ function M.next_pane(direction)
   end
 
   direction = dir_keys_kitty[direction] ---@diagnostic disable-line
-  local ok, _ = pcall(kitty_exec, { 'kitten', 'neighboring_window.py', direction })
+  local ok, _ = pcall(vim.fn.system, { 'kitten', '@', 'focus-window', '--match', 'neighbor:' .. direction })
+  -- local ok, _ = pcall(kitty_exec, { 'kitten', 'neighboring_window.py', direction })
   return ok
 end
 

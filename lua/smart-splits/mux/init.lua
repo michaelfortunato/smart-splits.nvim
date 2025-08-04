@@ -13,6 +13,11 @@ local directions_reverse = {
 }
 
 local function move_multiplexer_inner(direction, multiplexer)
+  if true then
+    local ok = multiplexer.next_pane(direction)
+    return true
+  end
+
   local current_pane = multiplexer.current_pane_id()
   if not current_pane then
     log.debug('Failed to get multiplexer pane ID')
